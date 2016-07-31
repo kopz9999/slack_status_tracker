@@ -7,3 +7,11 @@
 /pkg/
 /spec/reports/
 /tmp/
+# JetBrains
+.idea
+# Vagrant
+.vagrant
+# Cloud 9
+.c9
+# Environment Configuration
+.env
