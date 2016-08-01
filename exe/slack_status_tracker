@@ -2,4 +2,4 @@
 
 require "slack_status_tracker"
 
-SlackStatusTracker::ReportManager.instance.track
+SlackStatusTracker::ReportManager.instance.cmd

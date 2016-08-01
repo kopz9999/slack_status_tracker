@@ -1,8 +1,7 @@
 # SlackStatusTracker
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/slack_status_tracker`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Command line tool to get the number of online users in Slack at a given time.
+This tool is a scrapper based on [Watir](https://github.com/watir/watir).
 
 ## Installation
 
@@ -22,7 +21,66 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+To ensure the command line tool is installed, run the following command:
+
+    $ slack_status_tracker -h
+
+You should get the available options:
+
+```bash
+Usage: slack_status_tracker [options]
+    -s, --start                      Start to track
+    -o, --output [FILE_PATH]         Output file (default slack_online_users.txt)
+        --channels c1,c2,c3          Slack channels
+        --driver [BROWSER_DRIVER]    Browser Driver (default chrome)
+    -f, --frequency [MINUTES]        Time minutes frequency (default 30)
+    -u, --username USERNAME          Slack Username
+    -p, --password PASSWORD          Slack Password
+
+Common options:
+    -h, --help                       Show this message
+        --version                    Show version
+```
+
+### One time output
+
+The expected results are going to be printed in the command line and saved to 
+a file named slack_online_users.txt, which should be located in the same path 
+you ran the command:
+```bash
+slack_status_tracker -u slack_username -p slack_password --channels channel_1
+```
+Output:
+```bash
+Time                            Online Users
+2016-08-01 09:00:55 +0000       11
+```
+
+### Daemon
+
+Just append the -s option to keep it running every n minutes you want 
+(by default 30):
+
+```bash
+slack_status_tracker -s -u slack_username -p slack_password --channels channel_1
+```
+Output:
+```bash
+Time                            Online Users
+2016-08-01 09:00:55 +0000       11
+```
+
+For every 10 min
+
+```bash
+slack_status_tracker -s -u slack_username -p slack_password --channels channel_1
+-f 10
+```
+Output:
+```bash
+Time                            Online Users
+2016-08-01 09:00:55 +0000       11
+```
 
 ## Development
 

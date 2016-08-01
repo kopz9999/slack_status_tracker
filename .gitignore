@@ -15,3 +15,5 @@
 .c9
 # Environment Configuration
 .env
+# Test output
+slack_online_users.txt
