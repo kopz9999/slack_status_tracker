@@ -3,6 +3,7 @@ require "singleton"
 require "watir"
 require 'headless'
 require 'optparse'
+require 'json'
 # App
 require "slack_status_tracker/version"
 require "slack_status_tracker/report_manager"

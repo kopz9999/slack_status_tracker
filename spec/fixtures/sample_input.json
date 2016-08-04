@@ -1,0 +1,14 @@
+{
+  "channels": [
+    {
+      "name": "channel 1",
+      "username": "user1",
+      "password": "secret1"
+    },
+    {
+      "name": "channel 2",
+      "username": "user2",
+      "password": "secret2"
+    }
+  ]
+}

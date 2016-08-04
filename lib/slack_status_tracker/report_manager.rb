@@ -3,23 +3,53 @@ module SlackStatusTracker
     include Singleton
 
     attr_accessor :output_path
+    attr_accessor :json_hash
 
     def cmd
       options = parse_options ARGV
       set_output options
+      set_json_hash options
       frequency = options.fetch :frequency
       append_to_output "Time\t\t\t\tOnline Users"
       if options[:start]
         while true
-          process_channels options
+          verify_options options
           sleep frequency*60
         end
       else
-        process_channels options
+        verify_options options
       end
     end
 
-    def process_channels(options = {})
+    def verify_options(options = {})
+      if self.json_hash.nil?
+        process_options options
+      else
+        process_json options
+      end
+    end
+
+    def process_json(options)
+      driver = options.fetch :driver
+      total = 0
+      time = Time.now
+
+      self.json_hash[:channels].each do |channel_hash|
+        scrapper = SlackStatusTracker::Scrapper.new(channel_hash[:username],
+                                                    channel_hash[:password],
+                                                    driver,
+                                                    channel_hash[:name])
+        begin
+          scrapper.retrieve_users
+          total += scrapper.current_online_users
+        rescue => e
+          puts e.backtrace
+        end
+      end
+      append_to_output "#{time}\t#{total}"
+    end
+
+    def process_options(options = {})
       channels = options.fetch :channels
       username = options.fetch :username
       password = options.fetch :password
@@ -52,6 +82,11 @@ module SlackStatusTracker
         opts.on("-o", "--output [FILE_PATH]",
                 "Output file (default slack_online_users.txt)") do |o|
           options[:output] = o
+        end
+
+        opts.on("-i", "--input [FILE_PATH]",
+                "JSON file with credentials about channels") do |i|
+          options[:input] = i
         end
 
         opts.on("--channels c1,c2,c3", Array,
@@ -107,6 +142,13 @@ module SlackStatusTracker
       self.output_path = options[:output]
       if self.output_path.nil?
         self.output_path = File.join(Dir.pwd, 'slack_online_users.txt')
+      end
+    end
+
+    def set_json_hash(options)
+      if (input_path = options[:input])
+        self.json_hash =
+          JSON.parse(File.read(input_path), symbolize_names: true)
       end
     end
   end

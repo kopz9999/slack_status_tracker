@@ -31,6 +31,7 @@ You should get the available options:
 Usage: slack_status_tracker [options]
     -s, --start                      Start to track
     -o, --output [FILE_PATH]         Output file (default slack_online_users.txt)
+    -i, --input [FILE_PATH]          JSON file with credentials about channels
         --channels c1,c2,c3          Slack channels
         --driver [BROWSER_DRIVER]    Browser Driver (default chrome)
     -f, --frequency [MINUTES]        Time minutes frequency (default 30)
@@ -80,6 +81,33 @@ Output:
 ```bash
 Time                            Online Users
 2016-08-01 09:00:55 +0000       11
+```
+
+### Multiple channels
+In order to support multiple channels you need to pass a JSON configuration 
+file with the username and password for each channel. Specify the path to the 
+file with the proper settings.
+
+```json
+// spec/fixtures/sample_input.json 
+{
+  "channels": [
+    {
+      "name": "channel 1",
+      "username": "user1",
+      "password": "secret1"
+    },
+    {
+      "name": "channel 2",
+      "username": "user2",
+      "password": "secret2"
+    }
+  ]
+}
+```
+
+```bash
+slack_status_tracker -i spec/fixtures/sample_input.json
 ```
 
 ## Development
