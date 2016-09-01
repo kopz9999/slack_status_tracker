@@ -47,6 +47,7 @@ module SlackStatusTracker
     end
 
     def init_team
+      browser.wait_until{ browser.url.include?("/messages") }
       self.browser.goto "https://#{self.channel}.slack.com/team"
     end
   end
