@@ -10,7 +10,6 @@ module SlackStatusTracker
       set_output options
       set_json_hash options
       frequency = options.fetch :frequency
-      append_to_output "Time\t\t\t\tOnline Users"
       if options[:start]
         while true
           verify_options options
@@ -28,25 +27,29 @@ module SlackStatusTracker
         process_json options
       end
     end
+    
+    def process_channel(time, username, password, driver, channel)
+      begin
+        scrapper = SlackStatusTracker::Scrapper.new(username, password,
+                                                    driver, channel)
+        scrapper.retrieve_users
+        total = scrapper.current_online_users
+      rescue => e
+        puts e.backtrace
+        sleep 10
+        retry
+      end
+      append_to_output channel, "#{time}\t#{total}"
+    end
 
     def process_json(options)
       driver = options.fetch :driver
-      total = 0
       time = Time.now
 
       self.json_hash[:channels].each do |channel_hash|
-        scrapper = SlackStatusTracker::Scrapper.new(channel_hash[:username],
-                                                    channel_hash[:password],
-                                                    driver,
-                                                    channel_hash[:name])
-        begin
-          scrapper.retrieve_users
-          total += scrapper.current_online_users
-        rescue => e
-          puts e.backtrace
-        end
+        process_channel time, channel_hash[:username], channel_hash[:password], 
+                        driver, channel_hash[:name]
       end
-      append_to_output "#{time}\t#{total}"
     end
 
     def process_options(options = {})
@@ -54,20 +57,11 @@ module SlackStatusTracker
       username = options.fetch :username
       password = options.fetch :password
       driver = options.fetch :driver
-      total = 0
       time = Time.now
 
       channels.each do |c|
-        scrapper = SlackStatusTracker::Scrapper.new(username, password,
-                                                    driver, c)
-        begin
-          scrapper.retrieve_users
-          total += scrapper.current_online_users
-        rescue => e
-          puts e.backtrace
-        end
+        process_channel time, username, password, driver, c
       end
-      append_to_output "#{time}\t#{total}"
     end
 
     def parse_options(args)
@@ -133,15 +127,15 @@ module SlackStatusTracker
 
     protected
 
-    def append_to_output(content)
+    def append_to_output(channel, content)
       puts content
-      open(self.output_path, 'a') { |f| f.puts content }
+      open(File.join(self.output_path, "#{channel}.csv"), 'a') { |f| f.puts content }
     end
 
     def set_output(options)
       self.output_path = options[:output]
       if self.output_path.nil?
-        self.output_path = File.join(Dir.pwd, 'slack_online_users.txt')
+        self.output_path = Dir.pwd
       end
     end
 

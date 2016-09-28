@@ -22,6 +22,7 @@ module SlackStatusTracker
       init_team
       read_list
       browser.close
+      headless.destroy
     end
 
     protected
