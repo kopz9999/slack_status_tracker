@@ -1,5 +1,6 @@
 module SlackStatusTracker
   class ReportManager
+    FREQUENCY = 30
     include Singleton
 
     attr_accessor :output_path
@@ -12,7 +13,7 @@ module SlackStatusTracker
       frequency = options.fetch :frequency
       if options[:start]
         while true
-          verify_options options
+          Thread.new{ verify_options options }
           sleep frequency*60
         end
       else
@@ -34,6 +35,7 @@ module SlackStatusTracker
                                                     driver, channel)
         scrapper.retrieve_users
         total = scrapper.current_online_users
+        scrapper.headless.destroy
       rescue => e
         puts e.backtrace
         sleep 10
@@ -128,6 +130,7 @@ module SlackStatusTracker
     protected
 
     def append_to_output(channel, content)
+      puts "Channel: #{channel}"
       puts content
       open(File.join(self.output_path, "#{channel}.csv"), 'a') { |f| f.puts content }
     end

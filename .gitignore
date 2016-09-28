@@ -17,3 +17,5 @@
 .env
 # Test output
 slack_online_users.txt
+sample_input.json
+/*.csv

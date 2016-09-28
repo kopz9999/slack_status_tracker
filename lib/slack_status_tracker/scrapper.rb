@@ -5,13 +5,14 @@ module SlackStatusTracker
     attr_accessor :password
     attr_accessor :channel
     attr_accessor :current_online_users
+    attr_accessor :headless
 
     def initialize(username, password, driver, channel)
       self.username = username
       self.password = password
       self.channel = channel
-      headless = Headless.new
-      headless.start
+      self.headless = Headless.new
+      self.headless.start
       self.browser = Watir::Browser.new driver
       self.current_online_users = 0
     end
@@ -22,7 +23,6 @@ module SlackStatusTracker
       init_team
       read_list
       browser.close
-      headless.destroy
     end
 
     protected
