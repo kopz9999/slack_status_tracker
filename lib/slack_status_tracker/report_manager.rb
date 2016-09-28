@@ -132,7 +132,7 @@ module SlackStatusTracker
     def append_to_output(channel, content)
       puts "Channel: #{channel}"
       puts content
-      open(File.join(self.output_path, "#{channel}.csv"), 'a') { |f| f.puts content }
+      open(File.join(self.output_path, "#{channel}.txt"), 'a') { |f| f.puts content }
     end
 
     def set_output(options)
